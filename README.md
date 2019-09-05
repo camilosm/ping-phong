@@ -4,5 +4,4 @@
 ## Autores:
 
 Camilo Santana Melgaço
-
 Thiago Rodrigues da Silva
