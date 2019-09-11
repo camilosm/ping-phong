@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 struct jogador{
-	bool lado; //false esquerda, true direita
+	bool lado; //true esquerda, false direita
 	float y; //altura do centro do jogador
 	unsigned int pontos;
 };
