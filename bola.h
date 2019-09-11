@@ -8,6 +8,6 @@ typedef struct bola{
 	float vy;
 } bola;
 
-void mover(bola *bola);
+void rolar(bola *bola);
 void mudar_tamanho(bola *bola, float fator);
-void mudar_velocidade(bola *bola, fator);
+void mudar_velocidade(bola *bola, float fator);
