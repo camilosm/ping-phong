@@ -5,8 +5,9 @@
 #include "jogador.h"
 #include "bola.h"
 
+bool pause;
 jogador p1={true, 0, 50, 0}, p2={false, 0, 50, 0};
-bola b={0, 0, 10, -3, 2};
+bola b={0, 0, 10, 3, 2};
 
 void bolinha(bola b){
 	glBegin(GL_TRIANGLE_FAN);
@@ -38,6 +39,8 @@ void retangulo(jogador j){
 
 void desenhar(){
 	char pt1, pt2;
+	pt1=p1.pontos+'0';
+	pt2=p2.pontos+'0';
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(1, 1, 1);
@@ -45,10 +48,11 @@ void desenhar(){
 	retangulo(p2);
 	bolinha(b);
 
-	glRasterPos3f(0, 0, 0);
-	pt1=p1.pontos+'0';
-	pt2=p2.pontos+'0';
+	glRasterPos3f(-38, 30, 0);
+	if(pause)
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PAUSE");
 
+	glRasterPos3f(-25, 0, 0);
 	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, pt1);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_18, " - ");
 	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, pt2);
@@ -59,12 +63,18 @@ void desenhar(){
 void keyboard(unsigned char key, int x, int y){
 	switch(key){
 		case 'w':
+		case 'W':
 			if(p1.y<450)
 				subir(&p1);
 			break;
 		case 's':
+		case 'S':
 			if(p1.y>-450)
 				descer(&p1);
+			break;
+		case 'p':
+		case 'P':
+			pause^=true;
 			break;
 		case 27:
 			exit(0);
@@ -109,7 +119,8 @@ void atualiza(int periodo){
 		centralizar(&b);
 	}
 
-	rolar(&b);
+	if(!pause)
+		rolar(&b);
 
 	glutPostRedisplay();
 	glutTimerFunc(periodo, atualiza, periodo);
