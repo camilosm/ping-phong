@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 typedef struct bola{
 	float raio;
 	float x;
@@ -8,6 +6,6 @@ typedef struct bola{
 	float vy;
 } bola;
 
-void rolar(bola *bola);
+void centro(bola b);
 void mudar_tamanho(bola *bola, float fator);
 void mudar_velocidade(bola *bola, float fator);

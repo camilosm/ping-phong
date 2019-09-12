@@ -1,10 +1,22 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <stdio.h>
 #include "jogador.h"
 #include "bola.h"
 
 jogador p1={true, 0, 0}, p2={false, 0, 0};
-bola b={5, 0, 0, 1, 1};
+bola b={5, 0, 0, -3, 2};
+
+void bolinha(bola b){
+	glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(b.x,b.y,0);
+		glVertex3f(b.x+10,b.y+10,0);
+		glVertex3f(b.x-10,b.y+10,0);
+		glVertex3f(b.x-10,b.y-10,0);
+		glVertex3f(b.x+10,b.y-10,0);
+		glVertex3f(b.x+10,b.y+10,0);
+	glEnd();
+}
 
 void retangulo(jogador j){
 	glBegin(GL_TRIANGLE_FAN);
@@ -24,19 +36,23 @@ void retangulo(jogador j){
 }
 
 void desenhar(){
+	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(1, 1, 1);
 	retangulo(p1);
 	retangulo(p2);
+	bolinha(b);
 	glutSwapBuffers();
 }
 
 void keyboard(unsigned char key, int x, int y){
 	switch(key){
 		case 'w':
-			p1.y++;
+			if(p1.y<450)
+				p1.y+=50;
 			break;
 		case 's':
-			p1.y--;
+			if(p1.y>-450)
+				p1.y-=50;
 			break;
 		case 27:
 			exit(0);
@@ -46,10 +62,12 @@ void keyboard(unsigned char key, int x, int y){
 void special(int key, int x, int y){
 	switch(key){
 		case GLUT_KEY_UP:
-			p2.y+=100;
+			if(p2.y<450)
+				p2.y+=50;
 			break;
 		case GLUT_KEY_DOWN:
-			p2.y-=100;
+			if(p2.y>-450)
+				p2.y-=50;
 			break;
 		case 27:
 			exit(0);
@@ -57,10 +75,30 @@ void special(int key, int x, int y){
 }
 
 void atualiza(int periodo){
-	if(b.x>500 || b.x<-500)
-		b.vx*=-1;
-	if(b.y>500 || b.y<-500)
+	//topo e fundo
+	if(b.y>490 || b.y<-490)
 		b.vy*=-1;
+
+	//laterais
+	if(b.x<-480)
+		if(b.y<p1.y+60 && b.y>p1.y-60)
+			b.vx*=-1;
+	if(b.x>480)
+		if(b.y<p2.y+60 && b.y>p2.y-60)
+			b.vx*=-1;
+
+	if(b.x>495){
+		p1.pontos++;
+		b.x=0;
+		b.y=0;
+	}
+
+	if(b.x<-495){
+		p2.pontos++;
+		b.x=0;
+		b.y=0;
+	}
+
 	b.x+=b.vx;
 	b.y+=b.vy;
 
