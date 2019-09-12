@@ -1,7 +1,7 @@
 typedef struct bola{
-	float raio;
 	float x;
 	float y;
+	float tamanho;
 	float vx;
 	float vy;
 } bola;

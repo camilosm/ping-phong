@@ -4,33 +4,33 @@
 #include "jogador.h"
 #include "bola.h"
 
-jogador p1={true, 0, 0}, p2={false, 0, 0};
-bola b={5, 0, 0, -3, 3};
+jogador p1={true, 0, 50, 0}, p2={false, 0, 50, 0};
+bola b={0, 0, 10, -3, 2};
 
 void bolinha(bola b){
 	glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(b.x,b.y,0);
-		glVertex3f(b.x+10,b.y+10,0);
-		glVertex3f(b.x-10,b.y+10,0);
-		glVertex3f(b.x-10,b.y-10,0);
-		glVertex3f(b.x+10,b.y-10,0);
-		glVertex3f(b.x+10,b.y+10,0);
+		glVertex2f(b.x,b.y);
+		glVertex2f(b.x+b.tamanho/2,b.y+b.tamanho/2);
+		glVertex2f(b.x-b.tamanho/2,b.y+b.tamanho/2);
+		glVertex2f(b.x-b.tamanho/2,b.y-b.tamanho/2);
+		glVertex2f(b.x+b.tamanho/2,b.y-b.tamanho/2);
+		glVertex2f(b.x+b.tamanho/2,b.y+b.tamanho/2);
 	glEnd();
 }
 
 void retangulo(jogador j){
 	glBegin(GL_TRIANGLE_FAN);
 		if(j.lado){
-			glVertex3f(-500,j.y-50,0);
-			glVertex3f(-480,j.y-50,0);
-			glVertex3f(-480,j.y+50,0);
-			glVertex3f(-500,j.y+50,0);
+			glVertex2f(-500,j.y-j.tamanho/2);
+			glVertex2f(-480,j.y-j.tamanho/2);
+			glVertex2f(-480,j.y+j.tamanho/2);
+			glVertex2f(-500,j.y+j.tamanho/2);
 		}
 		else{
-			glVertex3f(480,j.y-50,0);
-			glVertex3f(500,j.y-50,0);
-			glVertex3f(500,j.y+50,0);
-			glVertex3f(480,j.y+50,0);
+			glVertex2f(480,j.y-j.tamanho/2);
+			glVertex2f(500,j.y-j.tamanho/2);
+			glVertex2f(500,j.y+j.tamanho/2);
+			glVertex2f(480,j.y+j.tamanho/2);
 		}
 	glEnd();
 }
@@ -48,11 +48,11 @@ void keyboard(unsigned char key, int x, int y){
 	switch(key){
 		case 'w':
 			if(p1.y<450)
-				p1.y+=50;
+				subir(&p1);
 			break;
 		case 's':
 			if(p1.y>-450)
-				p1.y-=50;
+				descer(&p1);
 			break;
 		case 27:
 			exit(0);
@@ -63,11 +63,11 @@ void special(int key, int x, int y){
 	switch(key){
 		case GLUT_KEY_UP:
 			if(p2.y<450)
-				p2.y+=50;
+				subir(&p2);
 			break;
 		case GLUT_KEY_DOWN:
 			if(p2.y>-450)
-				p2.y-=50;
+				descer(&p2);
 			break;
 		case 27:
 			exit(0);

@@ -1,7 +1,11 @@
 #include "jogador.h"
 
-void mover(jogador *j){
-	j->y+=50;
+void subir(jogador *j){
+	j->y+=j->tamanho;
+}
+
+void descer(jogador *j){
+	j->y-=j->tamanho/2;
 }
 
 void pontuar(jogador *j){
@@ -10,4 +14,9 @@ void pontuar(jogador *j){
 
 void reset(jogador *j){
 	j->y=0;
+}
+
+void aumentar(jogador *j){
+	if(j->tamanho<=300);
+		j->tamanho+=50;
 }
