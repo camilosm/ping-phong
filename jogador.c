@@ -1,13 +1,13 @@
 #include "jogador.h"
 
-void mover(jogador *jogador, float distancia){
-	jogador->y+=distancia;
+void mover(jogador *j){
+	j->y+=50;
 }
 
-void pontuar(jogador *jogador, int pontos){
-	jogador->pontos+=pontos;
+void pontuar(jogador *j){
+	j->pontos+=1;
 }
 
-void reset(jogador *jogador){
-	jogador->y=0;
+void reset(jogador *j){
+	j->y=0;
 }

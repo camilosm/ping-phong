@@ -6,6 +6,9 @@ typedef struct bola{
 	float vy;
 } bola;
 
-void centro(bola b);
+void centralizar(bola *b);
+void rolar(bola *b);
+void inverter_x(bola *b);
+void inverter_y(bola *b);
 void mudar_tamanho(bola *bola, float fator);
 void mudar_velocidade(bola *bola, float fator);

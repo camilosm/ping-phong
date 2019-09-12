@@ -6,6 +6,6 @@ typedef struct jogador{
 	unsigned int pontos;
 } jogador;
 
-void mover(jogador *jogador, float distancia);
-void pontuar(jogador *jogador, int pontos);
-void reset(jogador *jogador);
+void mover(jogador *j);
+void pontuar(jogador *j);
+void reset(jogador *j);

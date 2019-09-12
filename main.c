@@ -5,7 +5,7 @@
 #include "bola.h"
 
 jogador p1={true, 0, 0}, p2={false, 0, 0};
-bola b={5, 0, 0, -3, 2};
+bola b={5, 0, 0, -3, 3};
 
 void bolinha(bola b){
 	glBegin(GL_TRIANGLE_FAN);
@@ -82,25 +82,22 @@ void atualiza(int periodo){
 	//laterais
 	if(b.x<-480)
 		if(b.y<p1.y+60 && b.y>p1.y-60)
-			b.vx*=-1;
+			inverter_x(&b);
 	if(b.x>480)
 		if(b.y<p2.y+60 && b.y>p2.y-60)
-			b.vx*=-1;
+			inverter_x(&b);
 
 	if(b.x>495){
-		p1.pontos++;
-		b.x=0;
-		b.y=0;
+		pontuar(&p1);
+		centralizar(&b);
 	}
 
 	if(b.x<-495){
-		p2.pontos++;
-		b.x=0;
-		b.y=0;
+		pontuar(&p2);
+		centralizar(&b);
 	}
 
-	b.x+=b.vx;
-	b.y+=b.vy;
+	rolar(&b);
 
 	glutPostRedisplay();
 	glutTimerFunc(periodo, atualiza, periodo);
