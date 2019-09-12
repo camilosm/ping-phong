@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "jogador.h"
 #include "bola.h"
 
@@ -36,11 +37,22 @@ void retangulo(jogador j){
 }
 
 void desenhar(){
+	char pt1, pt2;
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(1, 1, 1);
 	retangulo(p1);
 	retangulo(p2);
 	bolinha(b);
+
+	glRasterPos3f(0, 0, 0);
+	pt1=p1.pontos+'0';
+	pt2=p2.pontos+'0';
+
+	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, pt1);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_18, " - ");
+	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, pt2);
+
 	glutSwapBuffers();
 }
 
@@ -81,10 +93,10 @@ void atualiza(int periodo){
 
 	//laterais
 	if(b.x<-480)
-		if(b.y<p1.y+60 && b.y>p1.y-60)
+		if(b.y<(p1.y+p1.tamanho/2+b.tamanho/2) && b.y>(p1.y-p1.tamanho/2-b.tamanho/2))
 			inverter_x(&b);
 	if(b.x>480)
-		if(b.y<p2.y+60 && b.y>p2.y-60)
+		if(b.y<(p2.y+p2.tamanho/2+b.tamanho/2) && b.y>(p2.y-p2.tamanho/2-b.tamanho/2))
 			inverter_x(&b);
 
 	if(b.x>495){
