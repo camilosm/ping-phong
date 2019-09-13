@@ -5,7 +5,7 @@
 #include "jogador.h"
 #include "bola.h"
 
-bool pause;
+bool pause=false, reinicia=false, sai=false;
 jogador p1={true, 0, 50, 0}, p2={false, 0, 50, 0};
 bola b={0, 0, 10, 3, 2};
 
@@ -48,6 +48,12 @@ void desenhar(){
 	retangulo(p2);
 	bolinha(b);
 
+	glRasterPos3f(-200, 60, 0);
+	if(reinicia)
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA REINICIAR");
+	if(sai)
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA SAIR");
+
 	glRasterPos3f(-38, 30, 0);
 	if(pause)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PAUSE");
@@ -58,6 +64,26 @@ void desenhar(){
 	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, pt2);
 
 	glutSwapBuffers();
+}
+
+void reiniciar(){
+	if(reinicia){
+		centralizar(&b);
+		reset(&p1);
+		reset(&p2);
+		reinicia=false;
+	}
+	else
+		reinicia=true;
+		sai=false;
+}
+
+void sair(){
+	if(sai)
+		exit(0);
+	else
+		sai=true;
+		reinicia=false;
 }
 
 void keyboard(unsigned char key, int x, int y){
@@ -76,8 +102,13 @@ void keyboard(unsigned char key, int x, int y){
 		case 'P':
 			pause^=true;
 			break;
+		case 'r':
+		case 'R':
+			reiniciar();
+			break;
 		case 27:
-			exit(0);
+			sair();
+			break;
 	}
 }
 
@@ -91,8 +122,6 @@ void special(int key, int x, int y){
 			if(p2.y>-450)
 				descer(&p2);
 			break;
-		case 27:
-			exit(0);
 	}
 }
 
