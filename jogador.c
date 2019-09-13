@@ -14,6 +14,7 @@ void pontuar(jogador *j){
 
 void reset(jogador *j){
 	j->y=0;
+	j->pontos=0;
 }
 
 void aumentar(jogador *j){
