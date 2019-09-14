@@ -3,7 +3,8 @@
 typedef struct jogador{
 	bool lado; //true esquerda, false direita
 	float y; //posicao do centro do jogador
-	float tamanho; //tamanho vertical do jogador
+	float altura;
+	float largura; //tamanho vertical do jogador
 	unsigned int pontos;
 } jogador;
 
