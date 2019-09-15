@@ -14,9 +14,9 @@
 #define PONTOS_SET 11
 
 bool pause=false, reinicia=false, sai=false;
-int ganhador=0;
+int ganhador=0, textura_fundo;
 jogador p1={-1, 0, 0.1*ALTURA_MUNDO, 0, 0}, p2={1, 0, 0.1*ALTURA_MUNDO, 0, 0};
-bola b={0, 0, 20, 20, 2, 0};
+bola b={0, 0, 20, 6, 3, 0};
 
 unsigned int carregar_textura(char* arquivo){
     unsigned int id = SOIL_load_OGL_texture(arquivo, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
@@ -27,6 +27,22 @@ unsigned int carregar_textura(char* arquivo){
     return id;
 }
 
+void fundo(){
+	glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textura_fundo);
+		glBegin(GL_TRIANGLE_FAN);
+			glTexCoord2f(1, 1);
+			glVertex2f(+LARGURA_MUNDO/2, +ALTURA_MUNDO/2);
+			glTexCoord2f(0, 1);
+			glVertex2f(-LARGURA_MUNDO/2, +ALTURA_MUNDO/2);
+			glTexCoord2f(0, 0);
+			glVertex2f(-LARGURA_MUNDO/2, -ALTURA_MUNDO/2);
+			glTexCoord2f(1, 0);
+			glVertex2f(+LARGURA_MUNDO/2, -ALTURA_MUNDO/2);
+		glEnd();
+	glDisable(GL_TEXTURE_2D);
+}
+
 void bolinha(bola b){
 	glPushMatrix();
 		glTranslatef(b.x, b.y, 0);
@@ -35,13 +51,10 @@ void bolinha(bola b){
 			glBegin(GL_TRIANGLE_FAN);
 				glTexCoord2f(1, 1);
 				glVertex2f(+b.tamanho/2, +b.tamanho/2);
-
 				glTexCoord2f(0, 1);
 				glVertex2f(-b.tamanho/2, +b.tamanho/2);
-
 				glTexCoord2f(0, 0);
 				glVertex2f(-b.tamanho/2, -b.tamanho/2);
-
 				glTexCoord2f(1, 0);
 				glVertex2f(+b.tamanho/2, -b.tamanho/2);
 			glEnd();
@@ -49,39 +62,47 @@ void bolinha(bola b){
 	glPopMatrix();
 }
 
-void retangulo(jogador j){
+void raquete(jogador j){
 	float jogador_x=j.lado*(LARGURA_MUNDO/2-LARGURA_JOGADOR/2);
 	glPushMatrix();
 		glTranslatef(jogador_x, j.y, 0);
-		glBegin(GL_TRIANGLE_FAN);
-			glVertex2f(+LARGURA_JOGADOR/2, +j.tamanho/2);
-			glVertex2f(-LARGURA_JOGADOR/2, +j.tamanho/2);
-			glVertex2f(-LARGURA_JOGADOR/2, -j.tamanho/2);
-			glVertex2f(+LARGURA_JOGADOR/2, -j.tamanho/2);
-		glEnd();
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, j.textura);
+			glBegin(GL_TRIANGLE_FAN);
+				glTexCoord2f(1, 1);
+				glVertex2f(+LARGURA_JOGADOR/2, +j.tamanho/2);
+				glTexCoord2f(0, 1);
+				glVertex2f(-LARGURA_JOGADOR/2, +j.tamanho/2);
+				glTexCoord2f(0, 0);
+				glVertex2f(-LARGURA_JOGADOR/2, -j.tamanho/2);
+				glTexCoord2f(1, 0);
+				glVertex2f(+LARGURA_JOGADOR/2, -j.tamanho/2);
+			glEnd();
+		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
+
 void mensagem(){
 	char placar[10];
 	int posicao;
 
-	glRasterPos3f(-200, 60, 0);
+	glRasterPos3f(-200, 150, 0);
 	if(reinicia)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA PAUSAR");
 	if(sai)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA SAIR");
 
-	glRasterPos3f(-38, 30, 0);
+	glRasterPos3f(-37, 120, 0);
 	if(pause)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PAUSE");
 
 	strcpy(placar, "P  GANHOU");
 	switch(ganhador){
 		case -1:
-			placar[1]='1';
+			placar[1]	='1';
 			break;
 		case 1:
-			placar[1]='1';
+			placar[1]='2';
 			break;
 		case 0:
 			placar[0]=p1.pontos/10+'0';
@@ -95,7 +116,7 @@ void mensagem(){
 			break;
 		}
 
-	glRasterPos3f(-30, 0, 0);
+	glRasterPos3f(-37, 90, 0);
 	for(posicao=0;placar[posicao]!='\0';posicao++)
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, placar[posicao]);
 }
@@ -104,8 +125,9 @@ void desenhar(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glColor3f(1, 1, 1);
-	retangulo(p1);
-	retangulo(p2);
+	fundo();
+	raquete(p1);
+	raquete(p2);
 	bolinha(b);
 	mensagem();
 
@@ -194,7 +216,7 @@ void atualiza(int periodo){
 	limite_laterais=LARGURA_MUNDO/2;
 	if(b.x+b.tamanho/2>limite_laterais){
 		if(pontuar(&p1, PONTOS_SET)){
-			ganhador=1;
+			ganhador=-1;
 			pause^=true;
 			reset(&p1);
 			reset(&p2);
@@ -207,7 +229,7 @@ void atualiza(int periodo){
 	}
 	if(b.x-b.tamanho/2<-limite_laterais){
 		if(pontuar(&p2, PONTOS_SET)){
-			ganhador=-1;
+			ganhador=1;
 			pause^=true;
 			reset(&p1);
 			reset(&p2);
@@ -267,7 +289,10 @@ void inicializar(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    b.textura = carregar_textura("texturas/rad.jpg");
+    textura_fundo=carregar_textura("texturas/fundo.png");
+		b.textura = carregar_textura("texturas/bola.png");
+		p1.textura = carregar_textura("texturas/p1.png");
+		p2.textura = carregar_textura("texturas/p2.png");
 }
 
 int main(int argc, char **argv){
