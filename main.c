@@ -11,8 +11,8 @@
 #define LARGURA_PLAYER 20
 
 bool pause=false, reinicia=false, sai=false;
-jogador p1={-1, 0, 50, 0}, p2={1, 0, 50, 0};
-bola b={0, 0, 10, 6, 2};
+jogador p1={-1, 0, 0.1*ALTURA_MUNDO, 0}, p2={1, 0, 0.1*ALTURA_MUNDO, 0};
+bola b={0, 0, 10, 6, 3};
 
 void bolinha(bola b){
 	glPushMatrix();
@@ -130,8 +130,11 @@ void keyboard(unsigned char key, int x, int y){
 // }
 
 void atualiza(int periodo){
+	int topo_fundo;
+
 	//topo e fundo
-	if(b.y>490 || b.y<-490)
+	topo_fundo=LARGURA_MUNDO/2-b.tamanho/2;
+	if(b.y>topo_fundo || b.y<-topo_fundo)
 		b.vy*=-1;
 
 	//laterais
