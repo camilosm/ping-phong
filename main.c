@@ -2,39 +2,41 @@
 #include <GL/freeglut.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "jogador.h"
 #include "bola.h"
 
+#define LARGURA_MUNDO 1000
+#define ALTURA_MUNDO 1000
+#define LARGURA_PLAYER 20
+
 bool pause=false, reinicia=false, sai=false;
-jogador p1={true, 0, 50, 0}, p2={false, 0, 50, 0};
-bola b={0, 0, 10, 3, 2};
+jogador p1={-1, 0, 50, 0}, p2={1, 0, 50, 0};
+bola b={0, 0, 10, 6, 2};
 
 void bolinha(bola b){
-	glBegin(GL_TRIANGLE_FAN);
-		glVertex2f(b.x,b.y);
-		glVertex2f(b.x+b.tamanho/2,b.y+b.tamanho/2);
-		glVertex2f(b.x-b.tamanho/2,b.y+b.tamanho/2);
-		glVertex2f(b.x-b.tamanho/2,b.y-b.tamanho/2);
-		glVertex2f(b.x+b.tamanho/2,b.y-b.tamanho/2);
-		glVertex2f(b.x+b.tamanho/2,b.y+b.tamanho/2);
-	glEnd();
+	glPushMatrix();
+		glTranslatef(b.x, b.y, 0);
+		glBegin(GL_TRIANGLE_FAN);
+			glVertex2f(+b.tamanho/2, +b.tamanho/2);
+			glVertex2f(-b.tamanho/2, +b.tamanho/2);
+			glVertex2f(-b.tamanho/2, -b.tamanho/2);
+			glVertex2f(+b.tamanho/2, -b.tamanho/2);
+		glEnd();
+	glPopMatrix();
 }
 
 void retangulo(jogador j){
-	glBegin(GL_TRIANGLE_FAN);
-		if(j.lado){
-			glVertex2f(-500,j.y-j.tamanho/2);
-			glVertex2f(-480,j.y-j.tamanho/2);
-			glVertex2f(-480,j.y+j.tamanho/2);
-			glVertex2f(-500,j.y+j.tamanho/2);
-		}
-		else{
-			glVertex2f(480,j.y-j.tamanho/2);
-			glVertex2f(500,j.y-j.tamanho/2);
-			glVertex2f(500,j.y+j.tamanho/2);
-			glVertex2f(480,j.y+j.tamanho/2);
-		}
-	glEnd();
+	float jogador_x=j.lado*(LARGURA_MUNDO/2-LARGURA_PLAYER/2);
+	glPushMatrix();
+		glTranslatef(jogador_x, j.y, 0);
+		glBegin(GL_TRIANGLE_FAN);
+			glVertex2f(+LARGURA_PLAYER/2, +j.tamanho/2);
+			glVertex2f(-LARGURA_PLAYER/2, +j.tamanho/2);
+			glVertex2f(-LARGURA_PLAYER/2, -j.tamanho/2);
+			glVertex2f(+LARGURA_PLAYER/2, -j.tamanho/2);
+		glEnd();
+	glPopMatrix();
 }
 
 void desenhar(){
@@ -90,13 +92,17 @@ void keyboard(unsigned char key, int x, int y){
 	switch(key){
 		case 'w':
 		case 'W':
-			if(p1.y<450)
-				subir(&p1);
+			subir(&p1, ALTURA_MUNDO/2);
 			break;
 		case 's':
 		case 'S':
-			if(p1.y>-450)
-				descer(&p1);
+			descer(&p1, -ALTURA_MUNDO/2);
+			break;
+		case '1':
+			subir(&p2, ALTURA_MUNDO/2);
+			break;
+		case '0':
+			descer(&p2, -ALTURA_MUNDO/2);
 			break;
 		case 'p':
 		case 'P':
@@ -112,18 +118,16 @@ void keyboard(unsigned char key, int x, int y){
 	}
 }
 
-void special(int key, int x, int y){
-	switch(key){
-		case GLUT_KEY_UP:
-			if(p2.y<450)
-				subir(&p2);
-			break;
-		case GLUT_KEY_DOWN:
-			if(p2.y>-450)
-				descer(&p2);
-			break;
-	}
-}
+// void special(int key, int x, int y){
+// 	switch(key){
+// 		case GLUT_KEY_UP:
+// 			subir(&p2, ALTURA_MUNDO/2);
+// 			break;
+// 		case GLUT_KEY_DOWN:
+// 			descer(&p2, -ALTURA_MUNDO/2);
+// 			break;
+// 	}
+// }
 
 void atualiza(int periodo){
 	//topo e fundo
@@ -156,14 +160,38 @@ void atualiza(int periodo){
 }
 
 void redimensiona(int largura, int altura){
-	glViewport(0, 0, largura, altura);
+    typedef struct viewport{
+			float x;
+			float y;
+			float largura;
+			float altura;
+		} viewport;
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-500, 500, -500, 500, -1, 1);
+		viewport vp;
+		float razao_janela, razao_mundo;
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+		glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-LARGURA_MUNDO/2, LARGURA_MUNDO/2, -ALTURA_MUNDO/2, ALTURA_MUNDO/2, -1, 1);
+
+    razao_janela = (float)largura/altura;
+    razao_mundo = (float)LARGURA_MUNDO/ALTURA_MUNDO;
+
+    if(razao_janela<razao_mundo){
+			vp.altura = largura/razao_mundo;
+			vp.y = (altura-vp.altura)/2;
+			glViewport(0, vp.y, largura, vp.altura);
+    }
+    else if(razao_janela>razao_mundo){
+			vp.largura = (float)altura*razao_mundo;
+			vp.x = (largura-vp.largura)/2;
+			glViewport(vp.x, 0, vp.largura, altura);
+    }
+		else
+    	glViewport(0, 0, largura, altura);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 int main(int argc, char **argv){
@@ -176,7 +204,7 @@ int main(int argc, char **argv){
 	glutDisplayFunc(desenhar);
 	glutReshapeFunc(redimensiona);
 	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(special);
+	//glutSpecialFunc(special);
 	glutTimerFunc(0, atualiza, 15);
 
 	glutMainLoop();
