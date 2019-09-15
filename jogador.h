@@ -9,4 +9,3 @@ void subir(jogador *j, int limite);
 void descer(jogador *j, int limite);
 void pontuar(jogador *j);
 void reset(jogador *j);
-void aumentar(jogador *j);
