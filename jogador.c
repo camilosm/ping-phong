@@ -10,8 +10,13 @@ void descer(jogador *j, int limite){
 		j->y-=j->tamanho/2;
 }
 
-void pontuar(jogador *j){
-	j->pontos+=1;
+int pontuar(jogador *j, int set){
+	if(j->pontos+1==set){
+		j->pontos=0;
+		return 1;
+	}
+	j->pontos++;
+	return 0;
 }
 
 void reset(jogador *j){

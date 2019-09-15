@@ -4,22 +4,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "jogador.h"
 #include "bola.h"
 
 #define LARGURA_MUNDO 1000
 #define ALTURA_MUNDO 1000
 #define LARGURA_JOGADOR 20
+#define PONTOS_SET 11
 
 bool pause=false, reinicia=false, sai=false;
+int ganhador=0;
 jogador p1={-1, 0, 0.1*ALTURA_MUNDO, 0, 0}, p2={1, 0, 0.1*ALTURA_MUNDO, 0, 0};
-bola b={0, 0, 20, 5, 2, 0};
+bola b={0, 0, 20, 20, 2, 0};
 
 unsigned int carregar_textura(char* arquivo){
     unsigned int id = SOIL_load_OGL_texture(arquivo, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 
     if(!id)
-        printf("Erro carregando a textura: '%s'\n", SOIL_last_result());
+        printf("Erro carregando a textura '%s': '%s'\n", arquivo, SOIL_last_result());
 
     return id;
 }
@@ -30,18 +33,17 @@ void bolinha(bola b){
 		glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, b.textura);
 			glBegin(GL_TRIANGLE_FAN);
-				glTexCoord2f(0, 0);
-				glVertex2f(-b.tamanho/2, -b.tamanho/2);
-
-				glTexCoord2f(1, 0);
-				glVertex2f(+b.tamanho/2, -b.tamanho/2);
-
 				glTexCoord2f(1, 1);
 				glVertex2f(+b.tamanho/2, +b.tamanho/2);
 
 				glTexCoord2f(0, 1);
 				glVertex2f(-b.tamanho/2, +b.tamanho/2);
 
+				glTexCoord2f(0, 0);
+				glVertex2f(-b.tamanho/2, -b.tamanho/2);
+
+				glTexCoord2f(1, 0);
+				glVertex2f(+b.tamanho/2, -b.tamanho/2);
 			glEnd();
 		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
@@ -59,21 +61,13 @@ void retangulo(jogador j){
 		glEnd();
 	glPopMatrix();
 }
-
-void desenhar(){
-	char pt1, pt2;
-	pt1=p1.pontos+'0';
-	pt2=p2.pontos+'0';
-
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(1, 1, 1);
-	retangulo(p1);
-	retangulo(p2);
-	bolinha(b);
+void mensagem(){
+	char placar[10];
+	int posicao;
 
 	glRasterPos3f(-200, 60, 0);
 	if(reinicia)
-		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA REINICIAR");
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA PAUSAR");
 	if(sai)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA SAIR");
 
@@ -81,10 +75,39 @@ void desenhar(){
 	if(pause)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PAUSE");
 
-	glRasterPos3f(-25, 0, 0);
-	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, pt1);
-	glutBitmapString(GLUT_BITMAP_HELVETICA_18, " - ");
-	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, pt2);
+	strcpy(placar, "P  GANHOU");
+	switch(ganhador){
+		case -1:
+			placar[1]='1';
+			break;
+		case 1:
+			placar[1]='1';
+			break;
+		case 0:
+			placar[0]=p1.pontos/10+'0';
+			placar[1]=p1.pontos%10+'0';
+			placar[2]=' ';
+			placar[3]='-';
+			placar[4]=' ';
+			placar[5]=p2.pontos/10+'0';
+			placar[6]=p2.pontos%10+'0';
+			placar[7]='\0';
+			break;
+		}
+
+	glRasterPos3f(-30, 0, 0);
+	for(posicao=0;placar[posicao]!='\0';posicao++)
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, placar[posicao]);
+}
+
+void desenhar(){
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glColor3f(1, 1, 1);
+	retangulo(p1);
+	retangulo(p2);
+	bolinha(b);
+	mensagem();
 
 	glutSwapBuffers();
 }
@@ -159,6 +182,7 @@ void atualiza(int periodo){
 		b.vy*=-1;
 
 	//colisão raquetes
+	//problemas aqui, necessário remodelar detecçao de colisão
 	laterais_jogadores=LARGURA_MUNDO/2-LARGURA_JOGADOR;
 	if(b.x-b.tamanho/2<-laterais_jogadores)
 		if(b.y<(p1.y+p1.tamanho/2+b.tamanho/2) && b.y>(p1.y-p1.tamanho/2-b.tamanho/2))
@@ -169,11 +193,29 @@ void atualiza(int periodo){
 
 	limite_laterais=LARGURA_MUNDO/2;
 	if(b.x+b.tamanho/2>limite_laterais){
-		pontuar(&p1);
+		if(pontuar(&p1, PONTOS_SET)){
+			ganhador=1;
+			pause^=true;
+			reset(&p1);
+			reset(&p2);
+		}
+		else
+			ganhador=0;
+
+		inverter_x(&b);
 		centralizar(&b);
 	}
 	if(b.x-b.tamanho/2<-limite_laterais){
-		pontuar(&p2);
+		if(pontuar(&p2, PONTOS_SET)){
+			ganhador=-1;
+			pause^=true;
+			reset(&p1);
+			reset(&p2);
+		}
+		else
+			ganhador=0;
+
+		inverter_x(&b);
 		centralizar(&b);
 	}
 
@@ -225,7 +267,7 @@ void inicializar(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    b.textura = carregar_textura("texturas/bolinha.jpg");
+    b.textura = carregar_textura("texturas/rad.jpg");
 }
 
 int main(int argc, char **argv){
@@ -240,7 +282,7 @@ int main(int argc, char **argv){
 	glutReshapeFunc(redimensiona);
 	glutKeyboardFunc(keyboard);
 	//glutSpecialFunc(special);
-	glutTimerFunc(0, atualiza, 15);
+	glutTimerFunc(0, atualiza, 10);
 
 	glutMainLoop();
 

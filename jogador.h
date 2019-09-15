@@ -8,5 +8,5 @@ typedef struct jogador{
 
 void subir(jogador *j, int limite);
 void descer(jogador *j, int limite);
-void pontuar(jogador *j);
+int pontuar(jogador *j, int set);
 void reset(jogador *j);
