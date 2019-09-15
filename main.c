@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <SOIL/SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -11,18 +12,38 @@
 #define LARGURA_JOGADOR 20
 
 bool pause=false, reinicia=false, sai=false;
-jogador p1={-1, 0, 0.1*ALTURA_MUNDO, 0}, p2={1, 0, 0.1*ALTURA_MUNDO, 0};
-bola b={0, 0, 10, 5, 2};
+jogador p1={-1, 0, 0.1*ALTURA_MUNDO, 0, 0}, p2={1, 0, 0.1*ALTURA_MUNDO, 0, 0};
+bola b={0, 0, 20, 5, 2, 0};
+
+unsigned int carregar_textura(char* arquivo){
+    unsigned int id = SOIL_load_OGL_texture(arquivo, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+
+    if(!id)
+        printf("Erro carregando a textura: '%s'\n", SOIL_last_result());
+
+    return id;
+}
 
 void bolinha(bola b){
 	glPushMatrix();
 		glTranslatef(b.x, b.y, 0);
-		glBegin(GL_TRIANGLE_FAN);
-			glVertex2f(+b.tamanho/2, +b.tamanho/2);
-			glVertex2f(-b.tamanho/2, +b.tamanho/2);
-			glVertex2f(-b.tamanho/2, -b.tamanho/2);
-			glVertex2f(+b.tamanho/2, -b.tamanho/2);
-		glEnd();
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, b.textura);
+			glBegin(GL_TRIANGLE_FAN);
+				glTexCoord2f(0, 0);
+				glVertex2f(-b.tamanho/2, -b.tamanho/2);
+
+				glTexCoord2f(1, 0);
+				glVertex2f(+b.tamanho/2, -b.tamanho/2);
+
+				glTexCoord2f(1, 1);
+				glVertex2f(+b.tamanho/2, +b.tamanho/2);
+
+				glTexCoord2f(0, 1);
+				glVertex2f(-b.tamanho/2, +b.tamanho/2);
+
+			glEnd();
+		glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
 
@@ -137,21 +158,21 @@ void atualiza(int periodo){
 	if(b.y>topo_fundo || b.y<-topo_fundo)
 		b.vy*=-1;
 
-	//laterais
+	//colisão raquetes
 	laterais_jogadores=LARGURA_MUNDO/2-LARGURA_JOGADOR;
-	if(b.x<-laterais_jogadores)
+	if(b.x-b.tamanho/2<-laterais_jogadores)
 		if(b.y<(p1.y+p1.tamanho/2+b.tamanho/2) && b.y>(p1.y-p1.tamanho/2-b.tamanho/2))
 			inverter_x(&b);
-	if(b.x>laterais_jogadores)
+	if(b.x+b.tamanho/2>laterais_jogadores)
 		if(b.y<(p2.y+p2.tamanho/2+b.tamanho/2) && b.y>(p2.y-p2.tamanho/2-b.tamanho/2))
 			inverter_x(&b);
 
-	limite_laterais=LARGURA_MUNDO/2-b.tamanho/2;
-	if(b.x>limite_laterais){
+	limite_laterais=LARGURA_MUNDO/2;
+	if(b.x+b.tamanho/2>limite_laterais){
 		pontuar(&p1);
 		centralizar(&b);
 	}
-	if(b.x<-limite_laterais){
+	if(b.x-b.tamanho/2<-limite_laterais){
 		pontuar(&p2);
 		centralizar(&b);
 	}
@@ -198,12 +219,22 @@ void redimensiona(int largura, int altura){
     glLoadIdentity();
 }
 
+void inicializar(){
+    glClearColor(0, 0, 0, 0);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    b.textura = carregar_textura("texturas/bolinha.jpg");
+}
+
 int main(int argc, char **argv){
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(800, 800);
 	glutCreateWindow("Ping Phong");
-	glClearColor(0, 0, 0, 0);
+
+	inicializar();
 
 	glutDisplayFunc(desenhar);
 	glutReshapeFunc(redimensiona);
@@ -212,5 +243,6 @@ int main(int argc, char **argv){
 	glutTimerFunc(0, atualiza, 15);
 
 	glutMainLoop();
+
 	return 0;
 }

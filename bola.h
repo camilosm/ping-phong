@@ -4,6 +4,7 @@ typedef struct bola{
 	float tamanho;
 	float vx;
 	float vy;
+	unsigned int textura;
 } bola;
 
 void centralizar(bola *b);
