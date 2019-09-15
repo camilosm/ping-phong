@@ -8,11 +8,11 @@
 
 #define LARGURA_MUNDO 1000
 #define ALTURA_MUNDO 1000
-#define LARGURA_PLAYER 20
+#define LARGURA_JOGADOR 20
 
 bool pause=false, reinicia=false, sai=false;
 jogador p1={-1, 0, 0.1*ALTURA_MUNDO, 0}, p2={1, 0, 0.1*ALTURA_MUNDO, 0};
-bola b={0, 0, 10, 6, 3};
+bola b={0, 0, 10, 5, 2};
 
 void bolinha(bola b){
 	glPushMatrix();
@@ -27,14 +27,14 @@ void bolinha(bola b){
 }
 
 void retangulo(jogador j){
-	float jogador_x=j.lado*(LARGURA_MUNDO/2-LARGURA_PLAYER/2);
+	float jogador_x=j.lado*(LARGURA_MUNDO/2-LARGURA_JOGADOR/2);
 	glPushMatrix();
 		glTranslatef(jogador_x, j.y, 0);
 		glBegin(GL_TRIANGLE_FAN);
-			glVertex2f(+LARGURA_PLAYER/2, +j.tamanho/2);
-			glVertex2f(-LARGURA_PLAYER/2, +j.tamanho/2);
-			glVertex2f(-LARGURA_PLAYER/2, -j.tamanho/2);
-			glVertex2f(+LARGURA_PLAYER/2, -j.tamanho/2);
+			glVertex2f(+LARGURA_JOGADOR/2, +j.tamanho/2);
+			glVertex2f(-LARGURA_JOGADOR/2, +j.tamanho/2);
+			glVertex2f(-LARGURA_JOGADOR/2, -j.tamanho/2);
+			glVertex2f(+LARGURA_JOGADOR/2, -j.tamanho/2);
 		glEnd();
 	glPopMatrix();
 }
@@ -130,27 +130,28 @@ void keyboard(unsigned char key, int x, int y){
 // }
 
 void atualiza(int periodo){
-	int topo_fundo;
+	float topo_fundo, laterais_jogadores, limite_laterais;
 
 	//topo e fundo
-	topo_fundo=LARGURA_MUNDO/2-b.tamanho/2;
+	topo_fundo=ALTURA_MUNDO/2-b.tamanho/2;
 	if(b.y>topo_fundo || b.y<-topo_fundo)
 		b.vy*=-1;
 
 	//laterais
-	if(b.x<-480)
+	laterais_jogadores=LARGURA_MUNDO/2-LARGURA_JOGADOR;
+	if(b.x<-laterais_jogadores)
 		if(b.y<(p1.y+p1.tamanho/2+b.tamanho/2) && b.y>(p1.y-p1.tamanho/2-b.tamanho/2))
 			inverter_x(&b);
-	if(b.x>480)
+	if(b.x>laterais_jogadores)
 		if(b.y<(p2.y+p2.tamanho/2+b.tamanho/2) && b.y>(p2.y-p2.tamanho/2-b.tamanho/2))
 			inverter_x(&b);
 
-	if(b.x>495){
+	limite_laterais=LARGURA_MUNDO/2-b.tamanho/2;
+	if(b.x>limite_laterais){
 		pontuar(&p1);
 		centralizar(&b);
 	}
-
-	if(b.x<-495){
+	if(b.x<-limite_laterais){
 		pontuar(&p2);
 		centralizar(&b);
 	}
