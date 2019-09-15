@@ -1,7 +1,5 @@
-#include <stdbool.h>
-
 typedef struct jogador{
-	bool lado; //true esquerda, false direita
+	int lado; //-1 esquerda, 1 direita
 	float y; //posicao do centro do jogador
 	float tamanho; //tamanho vertical do jogador
 	unsigned int pontos;
