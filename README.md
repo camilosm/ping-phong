@@ -25,6 +25,12 @@ Thiago Rodrigues da Silva
 
 O jogador 1 começa na esquerda, e o 2 na direita. O set termina quando um dos jogadores faz 11 pontos, mas se os 2 empatarem em 10, o set continua até que um deles faça 2 pontos de diferença. Ao término do set, os jogadores trocam de lado e um novo set se inicia.
 
+## Executar:
+
+`make`:compilar
+`make run`: executar o jogo
+`make clean`: limpar executáveis
+
 ## Agradecimentos:
 
 @fegemo: Professor da disciplina. :man_teacher:
