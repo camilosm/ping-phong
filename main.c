@@ -17,7 +17,7 @@ bool pause=false, reinicia=false, sai=false;
 int ganhador=0, textura_fundo;
 jogador p1={1, -1, 0, 0.1*ALTURA_MUNDO, 0, 0}, p2={2, 1, 0, 0.1*ALTURA_MUNDO, 0, 0};
 jogador *esquerda=&p1, *direita=&p2;
-bola b={false, 0, 0, 20, 30, 3, 0};
+bola b={false, 0, 0, 20, 5, 3, 0};
 
 unsigned int carregar_textura(char* arquivo){
     unsigned int id = SOIL_load_OGL_texture(arquivo, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
@@ -97,7 +97,7 @@ void mensagem(){
 
 	glRasterPos3f(-200, 150, 0);
 	if(reinicia)
-		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA PAUSAR");
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA REINICIAR");
 	if(sai)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PRESSIONE NOVAMENTE PARA SAIR");
 
