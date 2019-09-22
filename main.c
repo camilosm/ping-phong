@@ -62,12 +62,20 @@ void bolinha(bola b){
 	glPopMatrix();
 }
 
-void raquete(jogador j){
-	float jogador_x=j.lado*(LARGURA_MUNDO/2-LARGURA_JOGADOR/2);
+void raquete(jogador j, unsigned int oponente){
+	unsigned int textura;
+	float jogador_x;
+
+	if(j.pontos>oponente)
+		textura=j.textura_ganhando;
+	else
+		textura=j.textura_padrao;
+	jogador_x=j.lado*(LARGURA_MUNDO/2-LARGURA_JOGADOR/2);
+
 	glPushMatrix();
 		glTranslatef(jogador_x, j.y, 0);
 		glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, j.textura);
+			glBindTexture(GL_TEXTURE_2D, textura);
 			glBegin(GL_TRIANGLE_FAN);
 				glTexCoord2f(1, 1);
 				glVertex2f(+LARGURA_JOGADOR/2, +j.tamanho/2);
@@ -119,6 +127,10 @@ void mensagem(){
 	glRasterPos3f(-37, 90, 0);
 	for(posicao=0;placar[posicao]!='\0';posicao++)
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, placar[posicao]);
+
+	glRasterPos3f(-37, 60, 0);
+	if(!(PONTOS_SET-p1.pontos-1) || !(PONTOS_SET-p2.pontos-1))
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "MATCH POINT");
 }
 
 void desenhar(){
@@ -126,8 +138,8 @@ void desenhar(){
 
 	glColor3f(1, 1, 1);
 	fundo();
-	raquete(p1);
-	raquete(p2);
+	raquete(p1,p2.pontos);
+	raquete(p2,p1.pontos);
 	bolinha(b);
 	mensagem();
 
@@ -289,8 +301,10 @@ void inicializar(){
 
     textura_fundo=carregar_textura("texturas/fundo.png");
 		b.textura = carregar_textura("texturas/bola.png");
-		p1.textura = carregar_textura("texturas/p1.png");
-		p2.textura = carregar_textura("texturas/p2.png");
+		p1.textura_padrao = carregar_textura("texturas/p1.png");
+		p1.textura_ganhando = carregar_textura("texturas/p1_ganhando.png");
+		p2.textura_padrao = carregar_textura("texturas/p2.png");
+		p2.textura_ganhando = carregar_textura("texturas/p2_ganhando.png");
 }
 
 int main(int argc, char **argv){

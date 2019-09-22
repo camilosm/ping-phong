@@ -3,7 +3,8 @@ typedef struct jogador{
 	float y; //posicao do centro do jogador
 	float tamanho; //tamanho vertical do jogador
 	unsigned int pontos;
-	unsigned int textura;
+	unsigned int textura_padrao;
+	unsigned int textura_ganhando;
 } jogador;
 
 void subir(jogador *j, int limite);
