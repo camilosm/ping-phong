@@ -15,8 +15,9 @@
 
 bool pause=false, reinicia=false, sai=false;
 int ganhador=0, textura_fundo;
-jogador p1={-1, 0, 0.1*ALTURA_MUNDO, 0, 0}, p2={1, 0, 0.1*ALTURA_MUNDO, 0, 0};
-bola b={false, 0, 0, 20, 6, 3, 0};
+jogador p1={1, -1, 0, 0.1*ALTURA_MUNDO, 0, 0}, p2={2, 1, 0, 0.1*ALTURA_MUNDO, 0, 0};
+jogador *esquerda=&p1, *direita=&p2;
+bola b={false, 0, 0, 20, 30, 3, 0};
 
 unsigned int carregar_textura(char* arquivo){
     unsigned int id = SOIL_load_OGL_texture(arquivo, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
@@ -104,15 +105,11 @@ void mensagem(){
 	if(pause)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "PAUSE");
 
-	strcpy(placar, "P  GANHOU");
-	switch(ganhador){
-		case -1:
-			placar[1]	='1';
-			break;
-		case 1:
-			placar[1]='2';
-			break;
-		case 0:
+	if(ganhador){
+		strcpy(placar, "P  GANHOU");
+		placar[1]=ganhador+'0';
+	}
+	else{
 			placar[0]=p1.pontos/10+'0';
 			placar[1]=p1.pontos%10+'0';
 			placar[2]=' ';
@@ -121,15 +118,18 @@ void mensagem(){
 			placar[5]=p2.pontos/10+'0';
 			placar[6]=p2.pontos%10+'0';
 			placar[7]='\0';
-			break;
-		}
+	}
 
 	glRasterPos3f(-37, 90, 0);
 	for(posicao=0;placar[posicao]!='\0';posicao++)
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, placar[posicao]);
 
-	glRasterPos3f(-37, 60, 0);
-	if(!(PONTOS_SET-p1.pontos-1) || !(PONTOS_SET-p2.pontos-1))
+	glRasterPos3f(-47, 60, 0);
+	if(p1.pontos>=PONTOS_SET-1 && p2.pontos>=PONTOS_SET-1){
+		if(p1.pontos-1==p2.pontos || p2.pontos-1==p1.pontos)
+			glutBitmapString(GLUT_BITMAP_HELVETICA_18, "MATCH POINT");
+	}
+	else if(p1.pontos+1==PONTOS_SET || p2.pontos+1==PONTOS_SET)
 		glutBitmapString(GLUT_BITMAP_HELVETICA_18, "MATCH POINT");
 }
 
@@ -151,6 +151,10 @@ void reiniciar(){
 		centralizar(&b);
 		reset(&p1);
 		reset(&p2);
+		esquerda=&p1;
+		direita=&p2;
+		p1.lado=-1;
+		p2.lado=1;
 		reinicia=false;
 	}
 	else
@@ -170,11 +174,11 @@ void keyboard(unsigned char key, int x, int y){
 	switch(key){
 		case 'w':
 		case 'W':
-			subir(&p1, ALTURA_MUNDO/2);
+			subir(esquerda, ALTURA_MUNDO/2);
 			break;
 		case 's':
 		case 'S':
-			descer(&p1, -ALTURA_MUNDO/2);
+			descer(esquerda, -ALTURA_MUNDO/2);
 			break;
 		case 'p':
 		case 'P':
@@ -193,12 +197,22 @@ void keyboard(unsigned char key, int x, int y){
 void special(int key, int x, int y){
 	switch(key){
 		case GLUT_KEY_UP:
-			subir(&p2, ALTURA_MUNDO/2);
+			subir(direita, ALTURA_MUNDO/2);
 			break;
 		case GLUT_KEY_DOWN:
-			descer(&p2, -ALTURA_MUNDO/2);
+			descer(direita, -ALTURA_MUNDO/2);
 			break;
 	}
+}
+
+void trocar_lados(){
+	jogador *aux;
+
+	aux=esquerda;
+	esquerda=direita;
+	direita=aux;
+	p1.lado*=-1;
+	p2.lado*=-1;
 }
 
 void atualiza(int periodo){
@@ -213,23 +227,24 @@ void atualiza(int periodo){
 	//deadzone: bola ja passou do limite da raquete, mas nao bateu nela, logo nao volta mais
 	laterais_jogadores=LARGURA_MUNDO/2-LARGURA_JOGADOR;
 	if(b.x-b.tamanho/2<-laterais_jogadores)
-		if(b.y<(p1.y+p1.tamanho/2+b.tamanho/2) && b.y>(p1.y-p1.tamanho/2-b.tamanho/2))
+		if(b.y<(esquerda->y+esquerda->tamanho/2+b.tamanho/2) && b.y>(esquerda->y-esquerda->tamanho/2-b.tamanho/2))
 			inverter_x(&b);
 		else
 			deadzone(&b);
 	if(b.x+b.tamanho/2>laterais_jogadores)
-		if(b.y<(p2.y+p2.tamanho/2+b.tamanho/2) && b.y>(p2.y-p2.tamanho/2-b.tamanho/2))
+		if(b.y<(direita->y+direita->tamanho/2+b.tamanho/2) && b.y>(direita->y-direita->tamanho/2-b.tamanho/2))
 			inverter_x(&b);
 		else
 			deadzone(&b);
 
 	limite_laterais=LARGURA_MUNDO/2;
 	if(b.x+b.tamanho/2>limite_laterais){
-		if(pontuar(&p1, PONTOS_SET)){
-			ganhador=-1;
+		if(pontuar(esquerda, direita->pontos, PONTOS_SET)){
+			ganhador=esquerda->id;
 			pause^=true;
-			reset(&p1);
-			reset(&p2);
+			trocar_lados();
+			reset(esquerda);
+			reset(direita);
 		}
 		else
 			ganhador=0;
@@ -238,11 +253,12 @@ void atualiza(int periodo){
 		inverter_x(&b);
 	}
 	if(b.x-b.tamanho/2<-limite_laterais){
-		if(pontuar(&p2, PONTOS_SET)){
-			ganhador=1;
+		if(pontuar(direita, esquerda->pontos, PONTOS_SET)){
+			ganhador=direita->id;
 			pause^=true;
-			reset(&p1);
-			reset(&p2);
+			trocar_lados();
+			reset(esquerda);
+			reset(direita);
 		}
 		else
 			ganhador=0;
@@ -318,7 +334,7 @@ int main(int argc, char **argv){
 	glutDisplayFunc(desenhar);
 	glutReshapeFunc(redimensiona);
 	glutKeyboardFunc(keyboard);
-	//glutSpecialFunc(special);
+	glutSpecialFunc(special);
 	glutTimerFunc(0, atualiza, 10);
 
 	glutMainLoop();
