@@ -27,7 +27,7 @@ O jogador 1 começa na esquerda, e o 2 na direita. O set termina quando um dos j
 
 ## Executar:
 
-`$make`compilar
+`$make` compilar
 
 `$make run` executar o jogo
 
