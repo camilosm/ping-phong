@@ -12,9 +12,13 @@ Thiago Rodrigues da Silva
 ## Controles:
 
 **w/s:** movimentar jogador que está na esquerda
+
 **up/down:** movimentar jogador que está na direita
+
 **p:** pausar
+
 **r:** reiniciar
+
 **esc:** sair:
 
 ## Instruções:
