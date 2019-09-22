@@ -16,7 +16,7 @@
 bool pause=false, reinicia=false, sai=false;
 int ganhador=0, textura_fundo;
 jogador p1={-1, 0, 0.1*ALTURA_MUNDO, 0, 0}, p2={1, 0, 0.1*ALTURA_MUNDO, 0, 0};
-bola b={0, 0, 20, 6, 3, 0};
+bola b={false, 0, 0, 20, 6, 3, 0};
 
 unsigned int carregar_textura(char* arquivo){
     unsigned int id = SOIL_load_OGL_texture(arquivo, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
@@ -164,12 +164,6 @@ void keyboard(unsigned char key, int x, int y){
 		case 'S':
 			descer(&p1, -ALTURA_MUNDO/2);
 			break;
-		case '1':
-			subir(&p2, ALTURA_MUNDO/2);
-			break;
-		case '0':
-			descer(&p2, -ALTURA_MUNDO/2);
-			break;
 		case 'p':
 		case 'P':
 			pause^=true;
@@ -184,16 +178,16 @@ void keyboard(unsigned char key, int x, int y){
 	}
 }
 
-// void special(int key, int x, int y){
-// 	switch(key){
-// 		case GLUT_KEY_UP:
-// 			subir(&p2, ALTURA_MUNDO/2);
-// 			break;
-// 		case GLUT_KEY_DOWN:
-// 			descer(&p2, -ALTURA_MUNDO/2);
-// 			break;
-// 	}
-// }
+void special(int key, int x, int y){
+	switch(key){
+		case GLUT_KEY_UP:
+			subir(&p2, ALTURA_MUNDO/2);
+			break;
+		case GLUT_KEY_DOWN:
+			descer(&p2, -ALTURA_MUNDO/2);
+			break;
+	}
+}
 
 void atualiza(int periodo){
 	float topo_fundo, laterais_jogadores, limite_laterais;
@@ -201,17 +195,21 @@ void atualiza(int periodo){
 	//topo e fundo
 	topo_fundo=ALTURA_MUNDO/2-b.tamanho/2;
 	if(b.y>topo_fundo || b.y<-topo_fundo)
-		b.vy*=-1;
+		inverter_y(&b);
 
-	//colisão raquetes
-	//problemas aqui, necessário remodelar detecçao de colisão
+	//colisão na face das raquetes, para rebater
+	//deadzone: bola ja passou do limite da raquete, mas nao bateu nela, logo nao volta mais
 	laterais_jogadores=LARGURA_MUNDO/2-LARGURA_JOGADOR;
 	if(b.x-b.tamanho/2<-laterais_jogadores)
 		if(b.y<(p1.y+p1.tamanho/2+b.tamanho/2) && b.y>(p1.y-p1.tamanho/2-b.tamanho/2))
 			inverter_x(&b);
+		else
+			deadzone(&b);
 	if(b.x+b.tamanho/2>laterais_jogadores)
 		if(b.y<(p2.y+p2.tamanho/2+b.tamanho/2) && b.y>(p2.y-p2.tamanho/2-b.tamanho/2))
 			inverter_x(&b);
+		else
+			deadzone(&b);
 
 	limite_laterais=LARGURA_MUNDO/2;
 	if(b.x+b.tamanho/2>limite_laterais){
@@ -224,8 +222,8 @@ void atualiza(int periodo){
 		else
 			ganhador=0;
 
-		inverter_x(&b);
 		centralizar(&b);
+		inverter_x(&b);
 	}
 	if(b.x-b.tamanho/2<-limite_laterais){
 		if(pontuar(&p2, PONTOS_SET)){
@@ -237,8 +235,8 @@ void atualiza(int periodo){
 		else
 			ganhador=0;
 
-		inverter_x(&b);
 		centralizar(&b);
+		inverter_x(&b);
 	}
 
 	if(!pause)
