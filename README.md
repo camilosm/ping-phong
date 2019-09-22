@@ -27,5 +27,6 @@ O jogador 1 começa na esquerda, e o 2 na direita. O set termina quando um dos j
 
 ## Agradecimentos:
 
-@fegemo: Professor da disciplina.
+@fegemo: Professor da disciplina. :man_teacher:
+
 @domsson: Autor das texturas :heart:
