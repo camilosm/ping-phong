@@ -27,14 +27,14 @@ O jogador 1 começa na esquerda, e o 2 na direita. O set termina quando um dos j
 
 ## Executar:
 
-`$make` compilar
+`$ make` compilar
 
-`$make run` executar o jogo
+`$ make run` executar o jogo
 
-`$make clean` limpar executáveis
+`$ make clean` limpar executáveis
 
 ## Agradecimentos:
 
-@fegemo: Professor da disciplina. :man_teacher:
+@fegemo Professor da disciplina. :man_teacher:
 
-@domsson: Autor das texturas :heart:
+@domsson Autor das texturas :heart:
