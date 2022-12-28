@@ -19,7 +19,7 @@ Thiago Rodrigues da Silva
 
 **r:** reiniciar
 
-**esc:** sair:
+**esc:** sair
 
 ## Instruções:
 
