@@ -1,7 +1,7 @@
 # ping-phong
-### TP1 de Computação Gráfica
+### Trabalho de Computação Gráfica
 
-Jogo feito para o trabalho prático 1 da disciplina de Computação Gráfica do CEFET-MG.
+Jogo feito como trabalho prático para a disciplina de Computação Gráfica do CEFET-MG.
 
 ## Autores:
 
