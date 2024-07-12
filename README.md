@@ -11,19 +11,19 @@ Thiago Rodrigues da Silva
 
 ## Controles:
 
-**w/s:** movimentar jogador que está na esquerda
+**w/s**: movimentar jogador que está na esquerda
 
-**up/down:** movimentar jogador que está na direita
+**cima/baixo**: movimentar jogador que está na direita
 
-**p:** pausar
+**p**: pausar
 
-**r:** reiniciar
+**r**: reiniciar
 
-**esc:** sair
+**esc**: sair
 
 ## Instruções:
 
-O jogador 1 começa na esquerda, e o 2 na direita. O set termina quando um dos jogadores faz 11 pontos, mas se os 2 empatarem em 10, o set continua até que um deles faça 2 pontos de diferença. Ao término do set, os jogadores trocam de lado e um novo set se inicia.
+O jogador 1 começa na esquerda, e o 2 na direita. A rodada termina quando um dos jogadores faz 11 pontos. Mas se os 2 empatarem em 10, a rodada continua até que um deles faça 2 pontos de diferença. Ao término da rodada, os jogadores trocam de lado e uma nova rodada se inicia.
 
 ## Executar:
 
@@ -35,6 +35,6 @@ O jogador 1 começa na esquerda, e o 2 na direita. O set termina quando um dos j
 
 ## Agradecimentos:
 
-@fegemo professor da disciplina. :man_teacher:
+@fegemo professor da disciplina :man_teacher:
 
 @domsson autor das texturas :heart:
